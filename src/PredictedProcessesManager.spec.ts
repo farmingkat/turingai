@@ -29,12 +29,22 @@ describe('PredictedProcessesManager', () => {
 
   test('should reject if an AbortSignal is triggered during execution', async () => {
     const processes = [
-      new PredictedProcess(1, 'sleep 5'),
-      new PredictedProcess(2, 'sleep 5'),
-      new PredictedProcess(3, 'sleep 5'),
+      new PredictedProcess(1, 'sleep 3'),
+      new PredictedProcess(2, 'sleep 3'),
+      new PredictedProcess(3, 'sleep 3'),
     ];
     const manager = new PredictedProcessesManager(processes);
     const controller = new AbortController();
+
+    (spawn as jest.Mock).mockImplementation(() => ({
+      on: () => {
+        return new Promise((resolve) => {
+          setTimeout(resolve, 3000); // Resolve after 1 second
+        });
+      },
+      kill: jest.fn(),
+      removeAllListeners: jest.fn(),
+    }));
 
     setTimeout(() => controller.abort(), 1000); // Abort after 1 second
 
