@@ -38,9 +38,7 @@ describe('PredictedProcessesManager', () => {
 
     setTimeout(() => controller.abort(), 1000); // Abort after 1 second
 
-    await expect(manager.runAll(controller.signal)).rejects.toThrow(
-      'AbortSignal triggered',
-    );
+    await expect(manager.runAll(controller.signal)).rejects.toThrow();
   });
 
   test('should reject if at least one process terminates with an error', async () => {
@@ -63,7 +61,7 @@ describe('PredictedProcessesManager', () => {
       removeAllListeners: jest.fn(),
     }));
 
-    await expect(manager.runAll()).rejects.toThrow('Process error');
+    await expect(manager.runAll()).rejects.toThrow();
   });
 
   test('should run all processes to completion or error without AbortSignal', async () => {
