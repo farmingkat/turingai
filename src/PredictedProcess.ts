@@ -1,4 +1,4 @@
-import type { ChildProcess } from 'child_process';
+import { ChildProcess,exec,spawn } from 'child_process';
 
 export class PredictedProcess {
   private _childProcess: ChildProcess | null = null;
@@ -32,8 +32,52 @@ export class PredictedProcess {
    * signal.abort() // "Hello, world!" should not be printed.
    * ```
    */
+  
   public async run(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+  
+
+ 
+    let timeout;
+    if( signal  == undefined || signal == null){
+      return Promise.resolve()
+    }
+    if (signal?.aborted){
+      return Promise.reject(new DOMException("Signal already aborted", "AbortError"));
+    }
+   
+    let x;
+    let child
+    const exitHandler=()=>{
+
+    }
+    try{
+      return new Promise((resolve, reject) => {
+        child=spawn(this.command)
+        
+        child.on("close",exitHandler);
+        child.on("exit",exitHandler);
+        console.log("COMMAND")
+        console.log(this.command)
+        clearTimeout(timeout);
+        
+        const abortHandler=(event)=>{
+          reject(new DOMException("Signal already aborted", "AbortError"));
+        }
+        timeout = setTimeout(() => {
+          resolve();
+          this.memoize();
+          signal?.removeEventListener("abort", abortHandler);
+        }, 5000);   
+        signal?.addEventListener("abort", abortHandler);
+    });
+    }catch{
+      return Promise.reject(new DOMException("Signal already aborted", "AbortError"));
+      
+    }finally{
+      child.on("close",exitHandler);
+      child.on("exit",exitHandler);
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -66,6 +110,8 @@ export class PredictedProcess {
    */
   public memoize(): PredictedProcess {
     // TODO: Implement this.
+
+    
     return this;
   }
 }

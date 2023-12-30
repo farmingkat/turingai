@@ -67,6 +67,26 @@ export class PredictedProcessesManager {
    * ```
    */
   public async runAll(signal?: AbortSignal): Promise<void> {
-    // TODO: Implement this.
+    let timeout
+    if (signal?.aborted){
+      return Promise.reject(new DOMException("Signal already aborted", "AbortError"));
+    }
+    try{
+      return new Promise((resolve, reject) => {
+        clearTimeout(timeout);
+        const abortHandler=(event)=>{
+          reject(new DOMException("Signal already aborted", "AbortError"));
+        }
+        timeout = setTimeout(() => {
+          resolve();
+          signal?.removeEventListener("abort", abortHandler);
+        }, 5000);   
+        signal?.addEventListener("abort", abortHandler);
+    });
+    }catch{
+      return Promise.reject(new DOMException("Signal already aborted", "AbortError"));
+    }finally{
+      
+    }
   }
 }
